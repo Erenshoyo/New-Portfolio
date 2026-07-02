@@ -81,7 +81,7 @@ export default function Home() {
 
   // Fetch portfolio data from Express server API
   useEffect(() => {
-    const API_URL = 'http://localhost:5000/api';
+    const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api`;
 
     const fetchData = async () => {
       setIsLoading(true);
