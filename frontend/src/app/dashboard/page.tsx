@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<
     "profile" | "projects" | "skills" | "experience" | "education" | "blogs"
   >("profile");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Statuses
   const [isMockDb, setIsMockDb] = useState(false);
@@ -465,11 +466,32 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050508] flex">
+    <div className="min-h-screen bg-[#050508] flex flex-col md:flex-row">
+      {/* Mobile Menu Toggle */}
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#07070b]">
+        <h2 className="text-sm font-bold tracking-wider text-brand-primary">ADMIN</h2>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+        >
+          {sidebarOpen ? (
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
+
       {/* Sidebar Navigation */}
-      <aside className="w-64 border-r border-white/5 bg-[#07070b] flex flex-col justify-between">
+      <aside className={`${
+        sidebarOpen ? "block" : "hidden"
+      } md:block fixed md:relative inset-y-0 left-0 z-40 w-64 border-r border-white/5 bg-[#07070b] flex flex-col justify-between md:top-0 top-16 h-screen md:h-auto`}>
         <div className="p-6">
-          <h2 className="text-lg font-bold tracking-wider text-brand-primary mb-8">
+          <h2 className="hidden md:block text-lg font-bold tracking-wider text-brand-primary mb-8">
             ADMIN PANEL
           </h2>
 
@@ -486,7 +508,10 @@ export default function Dashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => {
+                    setActiveTab(tab.id as any);
+                    setSidebarOpen(false);
+                  }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                     activeTab === tab.id
                       ? "bg-brand-primary/10 text-brand-primary border-l-2 border-brand-primary"
@@ -494,7 +519,7 @@ export default function Dashboard() {
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {tab.label}
+                  <span className="hidden sm:inline">{tab.label}</span>
                 </button>
               );
             })}
@@ -512,31 +537,41 @@ export default function Dashboard() {
         </div>
       </aside>
 
+      {/* Sidebar Overlay for Mobile */}
+      {sidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-y-auto max-h-screen">
+      <main className="flex-1 flex flex-col overflow-y-auto w-full md:max-h-screen">
         {/* Top bar info */}
-        <header className="px-8 py-5 border-b border-white/5 bg-[#050508] flex items-center justify-between">
+        <header className="px-4 md:px-8 py-4 md:py-5 border-b border-white/5 bg-[#050508] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <LayoutDashboard className="w-5 h-5 text-brand-secondary" />
-            <h1 className="text-lg font-bold text-white uppercase tracking-wider">
+            <LayoutDashboard className="w-5 h-5 text-brand-secondary flex-shrink-0" />
+            <h1 className="text-base md:text-lg font-bold text-white uppercase tracking-wider truncate">
               {activeTab} Manager
             </h1>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 flex-wrap">
             {isMockDb && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs">
-                <Info className="w-4 h-4" />
-                <span>Offline Mock Mode</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs whitespace-nowrap">
+                <Info className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline">Offline Mock Mode</span>
+                <span className="sm:hidden">Mock</span>
               </div>
             )}
             <a
               href="/"
               target="_blank"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all duration-200"
+              className="inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-white transition-all duration-200 whitespace-nowrap"
             >
-              <Globe className="w-3.5 h-3.5" />
-              View Site
+              <Globe className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="hidden sm:inline">View Site</span>
+              <span className="sm:hidden">Site</span>
             </a>
           </div>
         </header>
@@ -548,14 +583,14 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="p-8 max-w-5xl w-full mx-auto space-y-6">
+        <div className="p-4 md:p-8 max-w-6xl w-full mx-auto space-y-6">
           {/* TAB 1: Profile Manager */}
           {activeTab === "profile" && profile && (
             <form
               onSubmit={handleProfileSave}
-              className="glass border-white/5 rounded-3xl p-6 md:p-8 space-y-6 shadow-md"
+              className="glass border-white/5 rounded-3xl p-4 md:p-8 space-y-6 shadow-md"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-2">
                   <label
                     htmlFor="prof-name"
@@ -571,7 +606,7 @@ export default function Dashboard() {
                     onChange={(e) =>
                       setProfile({ ...profile, name: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -589,7 +624,7 @@ export default function Dashboard() {
                     onChange={(e) =>
                       setProfile({ ...profile, designation: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -606,7 +641,7 @@ export default function Dashboard() {
                     onChange={(e) =>
                       setProfile({ ...profile, photo_url: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -623,7 +658,7 @@ export default function Dashboard() {
                     onChange={(e) =>
                       setProfile({ ...profile, resume_url: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -640,7 +675,7 @@ export default function Dashboard() {
                     onChange={(e) =>
                       setProfile({ ...profile, email: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -657,7 +692,7 @@ export default function Dashboard() {
                     onChange={(e) =>
                       setProfile({ ...profile, phone: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -674,7 +709,7 @@ export default function Dashboard() {
                     onChange={(e) =>
                       setProfile({ ...profile, whatsapp: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -698,17 +733,17 @@ export default function Dashboard() {
                         hobbies: e.target.value.split(",").map((s) => s.trim()),
                       })
                     }
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
               </div>
 
               {/* Social Links Sub-Grid */}
-              <div className="p-5 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+              <div className="p-4 md:p-5 bg-white/5 rounded-2xl border border-white/5 space-y-4">
                 <h3 className="text-sm font-bold text-white">
                   Social Media Links
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                   {["github", "linkedin", "twitter", "facebook"].map((plat) => (
                     <div key={plat} className="space-y-2">
                       <label
@@ -730,7 +765,7 @@ export default function Dashboard() {
                             },
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-[#09090b] border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-[#09090b] border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                       />
                     </div>
                   ))}
@@ -746,21 +781,22 @@ export default function Dashboard() {
                 </label>
                 <textarea
                   id="prof-journey"
-                  rows={5}
+                  rows={4}
                   value={profile.about_me}
                   onChange={(e) =>
                     setProfile({ ...profile, about_me: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm resize-none"
+                  className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full md:w-auto inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary/90 text-sm font-semibold text-white transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-center sm:justify-start gap-2 px-4 md:px-6 py-3 md:py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary/90 text-sm font-semibold text-white transition-all duration-200"
               >
                 <Save className="w-4 h-4" />
-                Save Profile Configuration
+                <span className="hidden sm:inline">Save Profile Configuration</span>
+                <span className="sm:hidden">Save</span>
               </button>
             </form>
           )}
@@ -768,11 +804,11 @@ export default function Dashboard() {
           {/* TAB 2: Projects CRUD */}
           {activeTab === "projects" && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h3 className="text-lg font-bold text-white">Project List</h3>
                 <button
                   onClick={() => openFormModal()}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
                 >
                   <Plus className="w-4 h-4" />
                   Add Project
@@ -780,14 +816,14 @@ export default function Dashboard() {
               </div>
 
               {/* List grid */}
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-3 md:gap-4">
                 {projects.map((project) => (
                   <div
                     key={project.id}
-                    className="glass p-5 rounded-2xl flex items-center justify-between gap-4 border-white/5"
+                    className="glass p-3 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-white/5"
                   >
-                    <div className="flex items-center gap-4 overflow-hidden">
-                      <div className="w-16 h-10 rounded-lg overflow-hidden bg-zinc-950 flex-shrink-0">
+                    <div className="flex items-center gap-3 sm:gap-4 overflow-hidden min-w-0">
+                      <div className="w-12 h-8 sm:w-16 sm:h-10 rounded-lg overflow-hidden bg-zinc-950 flex-shrink-0">
                         <img
                           src={
                             project.image_url ||
@@ -798,15 +834,15 @@ export default function Dashboard() {
                         />
                       </div>
                       <div className="overflow-hidden">
-                        <h4 className="font-bold text-white truncate">
+                        <h4 className="font-bold text-white truncate text-sm sm:text-base">
                           {project.title}
                         </h4>
-                        <p className="text-xs text-zinc-500 truncate max-w-lg">
+                        <p className="text-xs text-zinc-500 truncate max-w-xs">
                           {project.description}
                         </p>
                       </div>
                     </div>
-                    <div className="flex gap-2 flex-shrink-0">
+                    <div className="flex gap-2 flex-shrink-0 justify-end w-full sm:w-auto">
                       <button
                         onClick={() => openFormModal(project)}
                         className="p-2.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
@@ -836,54 +872,54 @@ export default function Dashboard() {
           {/* TAB 3: Skills CRUD */}
           {activeTab === "skills" && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h3 className="text-lg font-bold text-white">Skills Matrix</h3>
                 <button
                   onClick={() => openFormModal()}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
                 >
                   <Plus className="w-4 h-4" />
                   Add Skill
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 {skills.map((skill) => {
                   const iconResult = getSkillIcon(skill.name);
                   return (
                     <div
                       key={skill.id}
-                      className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                      className="glass p-3 md:p-5 rounded-2xl flex items-center justify-between border-white/5"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 md:gap-3 min-w-0 overflow-hidden">
                         {iconResult ? (
-                          <span className="text-2xl leading-none">
+                          <span className="text-xl md:text-2xl leading-none flex-shrink-0">
                             {iconResult.icon}
                           </span>
                         ) : (
-                          <span className="w-6 h-6 rounded bg-white/10 inline-block" />
+                          <span className="w-5 md:w-6 h-5 md:h-6 rounded bg-white/10 inline-block flex-shrink-0" />
                         )}
-                        <div>
-                          <h4 className="font-bold text-white">{skill.name}</h4>
+                        <div className="min-w-0 overflow-hidden">
+                          <h4 className="font-bold text-white truncate text-sm md:text-base">{skill.name}</h4>
                           <p className="text-xs text-zinc-400">
                             {skill.category} — {skill.percentage}%
                           </p>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1 md:gap-2 flex-shrink-0">
                         <button
                           onClick={() => openFormModal(skill)}
-                          className="p-2 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                          className="p-1.5 md:p-2 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                         </button>
                         <button
                           onClick={() =>
                             handleDelete("Skill", "skills", skill.id, setSkills)
                           }
-                          className="p-2 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
+                          className="p-1.5 md:p-2 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                         </button>
                       </div>
                     </div>
@@ -896,37 +932,37 @@ export default function Dashboard() {
           {/* TAB 4: Experience CRUD */}
           {activeTab === "experience" && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h3 className="text-lg font-bold text-white">
                   Experiences Timeline
                 </h3>
                 <button
                   onClick={() => openFormModal()}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
                 >
                   <Plus className="w-4 h-4" />
                   Add Work
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 {experiences.map((exp) => (
                   <div
                     key={exp.id}
-                    className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                    className="glass p-3 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-white/5"
                   >
-                    <div>
-                      <h4 className="font-bold text-white">{exp.role}</h4>
+                    <div className="min-w-0 overflow-hidden">
+                      <h4 className="font-bold text-white text-sm sm:text-base">{exp.role}</h4>
                       <p className="text-xs text-zinc-400">
                         {exp.company} | {exp.duration}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0 justify-end w-full sm:w-auto">
                       <button
                         onClick={() => openFormModal(exp)}
-                        className="p-2.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                        className="p-1.5 md:p-2.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                       </button>
                       <button
                         onClick={() =>
@@ -937,9 +973,9 @@ export default function Dashboard() {
                             setExperiences,
                           )
                         }
-                        className="p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
+                        className="p-1.5 md:p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                       </button>
                     </div>
                   </div>
@@ -951,37 +987,37 @@ export default function Dashboard() {
           {/* TAB 5: Education CRUD */}
           {activeTab === "education" && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h3 className="text-lg font-bold text-white">
                   Education History
                 </h3>
                 <button
                   onClick={() => openFormModal()}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
                 >
                   <Plus className="w-4 h-4" />
                   Add Degree
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 {educations.map((edu) => (
                   <div
                     key={edu.id}
-                    className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                    className="glass p-3 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-white/5"
                   >
-                    <div>
-                      <h4 className="font-bold text-white">{edu.degree}</h4>
+                    <div className="min-w-0 overflow-hidden">
+                      <h4 className="font-bold text-white text-sm sm:text-base">{edu.degree}</h4>
                       <p className="text-xs text-zinc-400">
                         {edu.institution} | {edu.duration}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0 justify-end w-full sm:w-auto">
                       <button
                         onClick={() => openFormModal(edu)}
-                        className="p-2.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                        className="p-1.5 md:p-2.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                       </button>
                       <button
                         onClick={() =>
@@ -992,9 +1028,9 @@ export default function Dashboard() {
                             setEducations,
                           )
                         }
-                        className="p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
+                        className="p-1.5 md:p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                       </button>
                     </div>
                   </div>
@@ -1006,45 +1042,45 @@ export default function Dashboard() {
           {/* TAB 6: Blogs CRUD */}
           {activeTab === "blogs" && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h3 className="text-lg font-bold text-white">
                   Published Blogs
                 </h3>
                 <button
                   onClick={() => openFormModal()}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
                 >
                   <Plus className="w-4 h-4" />
                   Add Post
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 {blogs.map((blog) => (
                   <div
                     key={blog.id}
-                    className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                    className="glass p-3 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-white/5"
                   >
-                    <div>
-                      <h4 className="font-bold text-white">{blog.title}</h4>
-                      <p className="text-xs text-zinc-500 truncate max-w-md">
+                    <div className="min-w-0 overflow-hidden">
+                      <h4 className="font-bold text-white text-sm sm:text-base">{blog.title}</h4>
+                      <p className="text-xs text-zinc-500 truncate">
                         {blog.content}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0 justify-end w-full sm:w-auto">
                       <button
                         onClick={() => openFormModal(blog)}
-                        className="p-2.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                        className="p-1.5 md:p-2.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                       </button>
                       <button
                         onClick={() =>
                           handleDelete("Blog", "blogs", blog.id, setBlogs)
                         }
-                        className="p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
+                        className="p-1.5 md:p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 md:w-4 h-3.5 md:h-4" />
                       </button>
                     </div>
                   </div>
@@ -1057,24 +1093,24 @@ export default function Dashboard() {
 
       {/* CREATE / EDIT DYNAMIC MODAL GATES */}
       {isAdding && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="glass border-white/10 w-full max-w-xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col animate-slide-up">
-            <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-3 md:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+          <div className="glass border-white/10 w-full md:max-w-xl max-h-[95vh] md:max-h-[85vh] rounded-t-3xl md:rounded-3xl overflow-hidden shadow-2xl flex flex-col animate-slide-up">
+            <div className="px-4 md:px-6 py-3 md:py-4 border-b border-white/5 flex justify-between items-center sticky top-0 bg-[#050508] z-10">
+              <h3 className="text-base md:text-lg font-bold text-white truncate">
                 {currentEditItem ? "Edit" : "Add New"} {activeTab.slice(0, -1)}
               </h3>
               <button
                 onClick={closeFormModal}
-                className="text-zinc-500 hover:text-white transition-all"
+                className="text-zinc-500 hover:text-white transition-all flex-shrink-0 ml-4"
               >
-                Close
+                ✕
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-4 flex-grow">
+            <div className="p-4 md:p-6 overflow-y-auto space-y-4 flex-grow">
               {/* Form Render based on ActiveTab */}
               {activeTab === "projects" && (
-                <form onSubmit={handleProjectSubmit} className="space-y-4">
+                <form onSubmit={handleProjectSubmit} className="space-y-3 md:space-y-4">
                   <div className="space-y-1">
                     <label
                       htmlFor="proj-title"
@@ -1093,7 +1129,7 @@ export default function Dashboard() {
                           title: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1113,7 +1149,7 @@ export default function Dashboard() {
                           image_url: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1135,10 +1171,10 @@ export default function Dashboard() {
                           tech_stack: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div className="space-y-1">
                       <label
                         htmlFor="proj-live"
@@ -1156,7 +1192,7 @@ export default function Dashboard() {
                             live_link: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1176,7 +1212,7 @@ export default function Dashboard() {
                             github_link: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       />
                     </div>
                   </div>
@@ -1190,7 +1226,7 @@ export default function Dashboard() {
                     <textarea
                       id="proj-desc"
                       required
-                      rows={3}
+                      rows={2}
                       value={projectForm.description}
                       onChange={(e) =>
                         setProjectForm({
@@ -1198,7 +1234,7 @@ export default function Dashboard() {
                           description: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1218,7 +1254,7 @@ export default function Dashboard() {
                           challenges: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1238,12 +1274,12 @@ export default function Dashboard() {
                           future_plans: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                    className="w-full py-2.5 md:py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
                   >
                     Save Project
                   </button>
@@ -1251,7 +1287,7 @@ export default function Dashboard() {
               )}
 
               {activeTab === "skills" && (
-                <form onSubmit={handleSkillSubmit} className="space-y-4">
+                <form onSubmit={handleSkillSubmit} className="space-y-3 md:space-y-4">
                   <div className="space-y-1">
                     <label
                       htmlFor="sk-name"
@@ -1267,7 +1303,7 @@ export default function Dashboard() {
                       onChange={(e) =>
                         setSkillForm({ ...skillForm, name: e.target.value })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                     />
                     {/* Auto icon preview */}
                     {skillForm.name &&
@@ -1289,7 +1325,7 @@ export default function Dashboard() {
                         );
                       })()}
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div className="space-y-1">
                       <label
                         htmlFor="sk-pct"
@@ -1314,7 +1350,7 @@ export default function Dashboard() {
                             percentage: parseInt(e.target.value),
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1333,7 +1369,7 @@ export default function Dashboard() {
                             category: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       >
                         <option>Frontend</option>
                         <option>Backend</option>
@@ -1343,7 +1379,7 @@ export default function Dashboard() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                    className="w-full py-2.5 md:py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
                   >
                     Save Skill
                   </button>
@@ -1351,7 +1387,7 @@ export default function Dashboard() {
               )}
 
               {activeTab === "experience" && (
-                <form onSubmit={handleExperienceSubmit} className="space-y-4">
+                <form onSubmit={handleExperienceSubmit} className="space-y-3 md:space-y-4">
                   <div className="space-y-1">
                     <label
                       htmlFor="exp-role"
@@ -1370,10 +1406,10 @@ export default function Dashboard() {
                           role: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div className="space-y-1">
                       <label
                         htmlFor="exp-comp"
@@ -1392,7 +1428,7 @@ export default function Dashboard() {
                             company: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1413,7 +1449,7 @@ export default function Dashboard() {
                             duration: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       />
                     </div>
                   </div>
@@ -1426,7 +1462,7 @@ export default function Dashboard() {
                     </label>
                     <textarea
                       id="exp-desc"
-                      rows={4}
+                      rows={3}
                       value={experienceForm.description}
                       onChange={(e) =>
                         setExperienceForm({
@@ -1434,12 +1470,12 @@ export default function Dashboard() {
                           description: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                    className="w-full py-2.5 md:py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
                   >
                     Save Experience
                   </button>
@@ -1447,7 +1483,7 @@ export default function Dashboard() {
               )}
 
               {activeTab === "education" && (
-                <form onSubmit={handleEducationSubmit} className="space-y-4">
+                <form onSubmit={handleEducationSubmit} className="space-y-3 md:space-y-4">
                   <div className="space-y-1">
                     <label
                       htmlFor="edu-deg"
@@ -1466,10 +1502,10 @@ export default function Dashboard() {
                           degree: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     <div className="space-y-1">
                       <label
                         htmlFor="edu-inst"
@@ -1488,7 +1524,7 @@ export default function Dashboard() {
                             institution: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       />
                     </div>
                     <div className="space-y-1">
@@ -1509,7 +1545,7 @@ export default function Dashboard() {
                             duration: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                        className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                       />
                     </div>
                   </div>
@@ -1522,7 +1558,7 @@ export default function Dashboard() {
                     </label>
                     <textarea
                       id="edu-desc"
-                      rows={4}
+                      rows={3}
                       value={educationForm.description}
                       onChange={(e) =>
                         setEducationForm({
@@ -1530,12 +1566,12 @@ export default function Dashboard() {
                           description: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                    className="w-full py-2.5 md:py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
                   >
                     Save Education Record
                   </button>
@@ -1543,7 +1579,7 @@ export default function Dashboard() {
               )}
 
               {activeTab === "blogs" && (
-                <form onSubmit={handleBlogSubmit} className="space-y-4">
+                <form onSubmit={handleBlogSubmit} className="space-y-3 md:space-y-4">
                   <div className="space-y-1">
                     <label
                       htmlFor="bl-title"
@@ -1559,7 +1595,7 @@ export default function Dashboard() {
                       onChange={(e) =>
                         setBlogForm({ ...blogForm, title: e.target.value })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1572,17 +1608,17 @@ export default function Dashboard() {
                     <textarea
                       id="bl-content"
                       required
-                      rows={6}
+                      rows={4}
                       value={blogForm.content}
                       onChange={(e) =>
                         setBlogForm({ ...blogForm, content: e.target.value })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                    className="w-full py-2.5 md:py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
                   >
                     Publish Post
                   </button>
