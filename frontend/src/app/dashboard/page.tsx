@@ -469,27 +469,51 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[#050508] flex flex-col md:flex-row">
       {/* Mobile Menu Toggle */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#07070b]">
-        <h2 className="text-sm font-bold tracking-wider text-brand-primary">ADMIN</h2>
+        <h2 className="text-sm font-bold tracking-wider text-brand-primary">
+          ADMIN
+        </h2>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 hover:bg-white/10 rounded-lg transition-colors"
         >
           {sidebarOpen ? (
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           ) : (
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           )}
         </button>
       </div>
 
       {/* Sidebar Navigation */}
-      <aside className={`${
-        sidebarOpen ? "block" : "hidden"
-      } md:block fixed md:relative inset-y-0 left-0 z-40 w-64 border-r border-white/5 bg-[#07070b] flex flex-col justify-between md:top-0 top-16 h-screen md:h-auto`}>
+      <aside
+        className={`${
+          sidebarOpen ? "block" : "hidden"
+        } md:block fixed md:relative inset-y-0 left-0 z-40 w-64 border-r border-white/5 bg-[#07070b] flex flex-col justify-between md:top-0 top-16 h-screen md:h-auto`}
+      >
         <div className="p-6">
           <h2 className="hidden md:block text-lg font-bold tracking-wider text-brand-primary mb-8">
             ADMIN PANEL
@@ -795,7 +819,9 @@ export default function Dashboard() {
                 className="w-full sm:w-auto inline-flex items-center justify-center sm:justify-start gap-2 px-4 md:px-6 py-3 md:py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary/90 text-sm font-semibold text-white transition-all duration-200"
               >
                 <Save className="w-4 h-4" />
-                <span className="hidden sm:inline">Save Profile Configuration</span>
+                <span className="hidden sm:inline">
+                  Save Profile Configuration
+                </span>
                 <span className="sm:hidden">Save</span>
               </button>
             </form>
@@ -900,7 +926,9 @@ export default function Dashboard() {
                           <span className="w-5 md:w-6 h-5 md:h-6 rounded bg-white/10 inline-block flex-shrink-0" />
                         )}
                         <div className="min-w-0 overflow-hidden">
-                          <h4 className="font-bold text-white truncate text-sm md:text-base">{skill.name}</h4>
+                          <h4 className="font-bold text-white truncate text-sm md:text-base">
+                            {skill.name}
+                          </h4>
                           <p className="text-xs text-zinc-400">
                             {skill.category} — {skill.percentage}%
                           </p>
@@ -952,7 +980,9 @@ export default function Dashboard() {
                     className="glass p-3 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-white/5"
                   >
                     <div className="min-w-0 overflow-hidden">
-                      <h4 className="font-bold text-white text-sm sm:text-base">{exp.role}</h4>
+                      <h4 className="font-bold text-white text-sm sm:text-base">
+                        {exp.role}
+                      </h4>
                       <p className="text-xs text-zinc-400">
                         {exp.company} | {exp.duration}
                       </p>
@@ -1007,7 +1037,9 @@ export default function Dashboard() {
                     className="glass p-3 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-white/5"
                   >
                     <div className="min-w-0 overflow-hidden">
-                      <h4 className="font-bold text-white text-sm sm:text-base">{edu.degree}</h4>
+                      <h4 className="font-bold text-white text-sm sm:text-base">
+                        {edu.degree}
+                      </h4>
                       <p className="text-xs text-zinc-400">
                         {edu.institution} | {edu.duration}
                       </p>
@@ -1062,7 +1094,9 @@ export default function Dashboard() {
                     className="glass p-3 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-white/5"
                   >
                     <div className="min-w-0 overflow-hidden">
-                      <h4 className="font-bold text-white text-sm sm:text-base">{blog.title}</h4>
+                      <h4 className="font-bold text-white text-sm sm:text-base">
+                        {blog.title}
+                      </h4>
                       <p className="text-xs text-zinc-500 truncate">
                         {blog.content}
                       </p>
@@ -1110,7 +1144,10 @@ export default function Dashboard() {
             <div className="p-4 md:p-6 overflow-y-auto space-y-4 flex-grow">
               {/* Form Render based on ActiveTab */}
               {activeTab === "projects" && (
-                <form onSubmit={handleProjectSubmit} className="space-y-3 md:space-y-4">
+                <form
+                  onSubmit={handleProjectSubmit}
+                  className="space-y-3 md:space-y-4"
+                >
                   <div className="space-y-1">
                     <label
                       htmlFor="proj-title"
@@ -1287,7 +1324,10 @@ export default function Dashboard() {
               )}
 
               {activeTab === "skills" && (
-                <form onSubmit={handleSkillSubmit} className="space-y-3 md:space-y-4">
+                <form
+                  onSubmit={handleSkillSubmit}
+                  className="space-y-3 md:space-y-4"
+                >
                   <div className="space-y-1">
                     <label
                       htmlFor="sk-name"
@@ -1387,7 +1427,10 @@ export default function Dashboard() {
               )}
 
               {activeTab === "experience" && (
-                <form onSubmit={handleExperienceSubmit} className="space-y-3 md:space-y-4">
+                <form
+                  onSubmit={handleExperienceSubmit}
+                  className="space-y-3 md:space-y-4"
+                >
                   <div className="space-y-1">
                     <label
                       htmlFor="exp-role"
@@ -1483,7 +1526,10 @@ export default function Dashboard() {
               )}
 
               {activeTab === "education" && (
-                <form onSubmit={handleEducationSubmit} className="space-y-3 md:space-y-4">
+                <form
+                  onSubmit={handleEducationSubmit}
+                  className="space-y-3 md:space-y-4"
+                >
                   <div className="space-y-1">
                     <label
                       htmlFor="edu-deg"
@@ -1579,7 +1625,10 @@ export default function Dashboard() {
               )}
 
               {activeTab === "blogs" && (
-                <form onSubmit={handleBlogSubmit} className="space-y-3 md:space-y-4">
+                <form
+                  onSubmit={handleBlogSubmit}
+                  className="space-y-3 md:space-y-4"
+                >
                   <div className="space-y-1">
                     <label
                       htmlFor="bl-title"
