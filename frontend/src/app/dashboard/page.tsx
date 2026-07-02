@@ -1,20 +1,36 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { 
-  Lock, LayoutDashboard, Briefcase, GraduationCap, Cpu, Code, BookOpen, 
-  User, Plus, Trash2, Edit2, LogOut, Save, Globe, AlertCircle, Info 
-} from 'lucide-react';
-import { getSkillIcon } from '@/lib/skillIcons';
+import { useState, useEffect } from "react";
+import {
+  Lock,
+  LayoutDashboard,
+  Briefcase,
+  GraduationCap,
+  Cpu,
+  Code,
+  BookOpen,
+  User,
+  Plus,
+  Trash2,
+  Edit2,
+  LogOut,
+  Save,
+  Globe,
+  AlertCircle,
+  Info,
+} from "lucide-react";
+import { getSkillIcon } from "@/lib/skillIcons";
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL || "https://new-portfolio-oqtj.onrender.com"}/api`;
 
 export default function Dashboard() {
   const [token, setToken] = useState<string | null>(null);
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [activeTab, setActiveTab] = useState<'profile' | 'projects' | 'skills' | 'experience' | 'education' | 'blogs'>('profile');
-  
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "projects" | "skills" | "experience" | "education" | "blogs"
+  >("profile");
+
   // Statuses
   const [isMockDb, setIsMockDb] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -32,15 +48,42 @@ export default function Dashboard() {
   const [isAdding, setIsAdding] = useState(false);
 
   // Form states
-  const [projectForm, setProjectForm] = useState({ title: '', image_url: '', description: '', tech_stack: '', live_link: '', github_link: '', challenges: '', future_plans: '' });
-  const [skillForm, setSkillForm] = useState({ name: '', percentage: 80, category: 'Frontend' });
-  const [experienceForm, setExperienceForm] = useState({ role: '', company: '', duration: '', description: '' });
-  const [educationForm, setEducationForm] = useState({ degree: '', institution: '', duration: '', description: '' });
-  const [blogForm, setBlogForm] = useState({ title: '', image_url: '', content: '' });
+  const [projectForm, setProjectForm] = useState({
+    title: "",
+    image_url: "",
+    description: "",
+    tech_stack: "",
+    live_link: "",
+    github_link: "",
+    challenges: "",
+    future_plans: "",
+  });
+  const [skillForm, setSkillForm] = useState({
+    name: "",
+    percentage: 80,
+    category: "Frontend",
+  });
+  const [experienceForm, setExperienceForm] = useState({
+    role: "",
+    company: "",
+    duration: "",
+    description: "",
+  });
+  const [educationForm, setEducationForm] = useState({
+    degree: "",
+    institution: "",
+    duration: "",
+    description: "",
+  });
+  const [blogForm, setBlogForm] = useState({
+    title: "",
+    image_url: "",
+    content: "",
+  });
 
   // Load token and load data
   useEffect(() => {
-    const savedToken = localStorage.getItem('dashboard_token');
+    const savedToken = localStorage.getItem("dashboard_token");
     if (savedToken) {
       verifyToken(savedToken);
     }
@@ -49,16 +92,16 @@ export default function Dashboard() {
   const verifyToken = async (authToken: string) => {
     try {
       const res = await fetch(`${API_URL}/auth/verify`, {
-        headers: { 'Authorization': `Bearer ${authToken}` }
+        headers: { Authorization: `Bearer ${authToken}` },
       });
       if (res.ok) {
         setToken(authToken);
         fetchDashboardData(authToken);
       } else {
-        localStorage.removeItem('dashboard_token');
+        localStorage.removeItem("dashboard_token");
       }
     } catch (e) {
-      console.error('Verify failed, fallback load');
+      console.error("Verify failed, fallback load");
       setToken(authToken); // allow offline dev
       fetchDashboardData(authToken);
     }
@@ -66,42 +109,44 @@ export default function Dashboard() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoginError('');
+    setLoginError("");
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('dashboard_token', data.token);
+        localStorage.setItem("dashboard_token", data.token);
         setToken(data.token);
         fetchDashboardData(data.token);
       } else {
-        setLoginError(data.message || 'Login failed');
+        setLoginError(data.message || "Login failed");
       }
     } catch (e) {
       // Offline fallback login for easy testing
-      if (password === 'admin123') {
-        const dummyToken = 'dummy-dev-jwt-token';
-        localStorage.setItem('dashboard_token', dummyToken);
+      if (password === "admin123") {
+        const dummyToken = "dummy-dev-jwt-token";
+        localStorage.setItem("dashboard_token", dummyToken);
         setToken(dummyToken);
         fetchDashboardData(dummyToken);
         setIsMockDb(true);
       } else {
-        setLoginError('Could not reach API server. Default password for fallback is admin123');
+        setLoginError(
+          "Could not reach API server. Default password for fallback is admin123",
+        );
       }
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('dashboard_token');
+    localStorage.removeItem("dashboard_token");
     setToken(null);
   };
 
   const fetchDashboardData = async (authToken: string) => {
-    const headers = { 'Authorization': `Bearer ${authToken}` };
+    const headers = { Authorization: `Bearer ${authToken}` };
     try {
       // Check if DB is using mock
       const profileRes = await fetch(`${API_URL}/profile`, { headers });
@@ -109,7 +154,7 @@ export default function Dashboard() {
         const p = await profileRes.json();
         setProfile(p);
       }
-      
+
       const projectsRes = await fetch(`${API_URL}/projects`, { headers });
       if (projectsRes.ok) setProjects(await projectsRes.json());
 
@@ -125,7 +170,9 @@ export default function Dashboard() {
       const blogRes = await fetch(`${API_URL}/blogs`, { headers });
       if (blogRes.ok) setBlogs(await blogRes.json());
     } catch (e) {
-      console.warn('Dashboard data fetch failed, using frontend local fallbacks');
+      console.warn(
+        "Dashboard data fetch failed, using frontend local fallbacks",
+      );
       setIsMockDb(true);
     }
   };
@@ -134,25 +181,25 @@ export default function Dashboard() {
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
-    setSaveStatus('Saving Profile...');
+    setSaveStatus("Saving Profile...");
     try {
       const res = await fetch(`${API_URL}/profile`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(profile)
+        body: JSON.stringify(profile),
       });
       if (res.ok) {
         const updated = await res.json();
         setProfile(updated);
-        showStatus('Profile saved successfully!');
+        showStatus("Profile saved successfully!");
       } else {
-        showStatus('Failed to save profile on server.');
+        showStatus("Failed to save profile on server.");
       }
     } catch (e) {
-      showStatus('Offline mock save: Profile updated locally.');
+      showStatus("Offline mock save: Profile updated locally.");
     }
   };
 
@@ -162,33 +209,46 @@ export default function Dashboard() {
   };
 
   // CRUD handlers
-  const handleCreateOrUpdate = async (type: string, route: string, body: any, setList: any) => {
-    setSaveStatus('Processing...');
+  const handleCreateOrUpdate = async (
+    type: string,
+    route: string,
+    body: any,
+    setList: any,
+  ) => {
+    setSaveStatus("Processing...");
     const isEdit = !!currentEditItem;
-    const url = isEdit ? `${API_URL}/${route}/${currentEditItem.id}` : `${API_URL}/${route}`;
-    const method = isEdit ? 'PUT' : 'POST';
+    const url = isEdit
+      ? `${API_URL}/${route}/${currentEditItem.id}`
+      : `${API_URL}/${route}`;
+    const method = isEdit ? "PUT" : "POST";
 
     try {
       const res = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
       if (res.ok) {
-        showStatus(`${type} ${isEdit ? 'updated' : 'created'} successfully!`);
+        showStatus(`${type} ${isEdit ? "updated" : "created"} successfully!`);
         fetchDashboardData(token!);
         closeFormModal();
       } else {
-        showStatus('Server returned an error.');
+        showStatus("Server returned an error.");
       }
     } catch (e) {
       // Fallback local operations
-      showStatus(`Mock Mode: ${type} simulated ${isEdit ? 'update' : 'creation'}.`);
+      showStatus(
+        `Mock Mode: ${type} simulated ${isEdit ? "update" : "creation"}.`,
+      );
       if (isEdit) {
-        setList((prev: any[]) => prev.map(item => item.id === currentEditItem.id ? { ...item, ...body } : item));
+        setList((prev: any[]) =>
+          prev.map((item) =>
+            item.id === currentEditItem.id ? { ...item, ...body } : item,
+          ),
+        );
       } else {
         const newId = Math.floor(Math.random() * 10000);
         setList((prev: any[]) => [...prev, { id: newId, ...body }]);
@@ -197,19 +257,24 @@ export default function Dashboard() {
     }
   };
 
-  const handleDelete = async (type: string, route: string, id: number, setList: any) => {
+  const handleDelete = async (
+    type: string,
+    route: string,
+    id: number,
+    setList: any,
+  ) => {
     if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
-    setSaveStatus('Deleting...');
+    setSaveStatus("Deleting...");
     try {
       const res = await fetch(`${API_URL}/${route}/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         showStatus(`${type} deleted successfully.`);
         fetchDashboardData(token!);
       } else {
-        showStatus('Failed to delete on server.');
+        showStatus("Failed to delete on server.");
       }
     } catch (e) {
       showStatus(`Mock Mode: Deleted locally.`);
@@ -220,25 +285,74 @@ export default function Dashboard() {
   const openFormModal = (item: any = null) => {
     setCurrentEditItem(item);
     setIsAdding(true);
-    if (activeTab === 'projects') {
-      setProjectForm(item ? {
-        title: item.title,
-        image_url: item.image_url || '',
-        description: item.description,
-        tech_stack: Array.isArray(item.tech_stack) ? item.tech_stack.join(', ') : item.tech_stack,
-        live_link: item.live_link || '',
-        github_link: item.github_link || '',
-        challenges: item.challenges || '',
-        future_plans: item.future_plans || ''
-      } : { title: '', image_url: '', description: '', tech_stack: '', live_link: '', github_link: '', challenges: '', future_plans: '' });
-    } else if (activeTab === 'skills') {
-      setSkillForm(item ? { name: item.name, percentage: item.percentage, category: item.category } : { name: '', percentage: 80, category: 'Frontend' });
-    } else if (activeTab === 'experience') {
-      setExperienceForm(item ? { role: item.role, company: item.company, duration: item.duration, description: item.description } : { role: '', company: '', duration: '', description: '' });
-    } else if (activeTab === 'education') {
-      setEducationForm(item ? { degree: item.degree, institution: item.institution, duration: item.duration, description: item.description } : { degree: '', institution: '', duration: '', description: '' });
-    } else if (activeTab === 'blogs') {
-      setBlogForm(item ? { title: item.title, image_url: item.image_url || '', content: item.content } : { title: '', image_url: '', content: '' });
+    if (activeTab === "projects") {
+      setProjectForm(
+        item
+          ? {
+              title: item.title,
+              image_url: item.image_url || "",
+              description: item.description,
+              tech_stack: Array.isArray(item.tech_stack)
+                ? item.tech_stack.join(", ")
+                : item.tech_stack,
+              live_link: item.live_link || "",
+              github_link: item.github_link || "",
+              challenges: item.challenges || "",
+              future_plans: item.future_plans || "",
+            }
+          : {
+              title: "",
+              image_url: "",
+              description: "",
+              tech_stack: "",
+              live_link: "",
+              github_link: "",
+              challenges: "",
+              future_plans: "",
+            },
+      );
+    } else if (activeTab === "skills") {
+      setSkillForm(
+        item
+          ? {
+              name: item.name,
+              percentage: item.percentage,
+              category: item.category,
+            }
+          : { name: "", percentage: 80, category: "Frontend" },
+      );
+    } else if (activeTab === "experience") {
+      setExperienceForm(
+        item
+          ? {
+              role: item.role,
+              company: item.company,
+              duration: item.duration,
+              description: item.description,
+            }
+          : { role: "", company: "", duration: "", description: "" },
+      );
+    } else if (activeTab === "education") {
+      setEducationForm(
+        item
+          ? {
+              degree: item.degree,
+              institution: item.institution,
+              duration: item.duration,
+              description: item.description,
+            }
+          : { degree: "", institution: "", duration: "", description: "" },
+      );
+    } else if (activeTab === "blogs") {
+      setBlogForm(
+        item
+          ? {
+              title: item.title,
+              image_url: item.image_url || "",
+              content: item.content,
+            }
+          : { title: "", image_url: "", content: "" },
+      );
     }
   };
 
@@ -250,28 +364,46 @@ export default function Dashboard() {
   // Submit functions
   const handleProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const stack = projectForm.tech_stack.split(',').map(s => s.trim()).filter(Boolean);
-    handleCreateOrUpdate('Project', 'projects', { ...projectForm, tech_stack: stack }, setProjects);
+    const stack = projectForm.tech_stack
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    handleCreateOrUpdate(
+      "Project",
+      "projects",
+      { ...projectForm, tech_stack: stack },
+      setProjects,
+    );
   };
 
   const handleSkillSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleCreateOrUpdate('Skill', 'skills', skillForm, setSkills);
+    handleCreateOrUpdate("Skill", "skills", skillForm, setSkills);
   };
 
   const handleExperienceSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleCreateOrUpdate('Experience', 'experience', experienceForm, setExperiences);
+    handleCreateOrUpdate(
+      "Experience",
+      "experience",
+      experienceForm,
+      setExperiences,
+    );
   };
 
   const handleEducationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleCreateOrUpdate('Education', 'education', educationForm, setEducations);
+    handleCreateOrUpdate(
+      "Education",
+      "education",
+      educationForm,
+      setEducations,
+    );
   };
 
   const handleBlogSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleCreateOrUpdate('Blog', 'blogs', blogForm, setBlogs);
+    handleCreateOrUpdate("Blog", "blogs", blogForm, setBlogs);
   };
 
   // Password Login Overlay Page
@@ -280,19 +412,28 @@ export default function Dashboard() {
       <div className="min-h-screen bg-[#050508] flex items-center justify-center p-4">
         {/* Glow */}
         <div className="absolute w-[300px] h-[300px] bg-brand-primary/10 rounded-full blur-[80px] -z-10"></div>
-        
+
         <div className="w-full max-w-md glass border-white/10 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
           <div className="flex flex-col items-center space-y-4 mb-8 text-center">
             <div className="p-4 rounded-2xl bg-brand-primary/10 border border-brand-primary/20 text-brand-primary">
               <Lock className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-white">Admin Authentication</h1>
-            <p className="text-zinc-500 text-sm">Please log in to manage your portfolio information.</p>
+            <h1 className="text-2xl font-extrabold tracking-tight text-white">
+              Admin Authentication
+            </h1>
+            <p className="text-zinc-500 text-sm">
+              Please log in to manage your portfolio information.
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="dashboard-pw" className="text-xs font-semibold text-zinc-400 uppercase">Dashboard Password</label>
+              <label
+                htmlFor="dashboard-pw"
+                className="text-xs font-semibold text-zinc-400 uppercase"
+              >
+                Dashboard Password
+              </label>
               <input
                 id="dashboard-pw"
                 type="password"
@@ -331,15 +472,15 @@ export default function Dashboard() {
           <h2 className="text-lg font-bold tracking-wider text-brand-primary mb-8">
             ADMIN PANEL
           </h2>
-          
+
           <nav className="space-y-1">
             {[
-              { id: 'profile', label: 'Basic Profile', icon: User },
-              { id: 'projects', label: 'Projects', icon: Code },
-              { id: 'skills', label: 'Skills', icon: Cpu },
-              { id: 'experience', label: 'Experience', icon: Briefcase },
-              { id: 'education', label: 'Education', icon: GraduationCap },
-              { id: 'blogs', label: 'Blogs', icon: BookOpen },
+              { id: "profile", label: "Basic Profile", icon: User },
+              { id: "projects", label: "Projects", icon: Code },
+              { id: "skills", label: "Skills", icon: Cpu },
+              { id: "experience", label: "Experience", icon: Briefcase },
+              { id: "education", label: "Education", icon: GraduationCap },
+              { id: "blogs", label: "Blogs", icon: BookOpen },
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -348,8 +489,8 @@ export default function Dashboard() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                     activeTab === tab.id
-                      ? 'bg-brand-primary/10 text-brand-primary border-l-2 border-brand-primary'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                      ? "bg-brand-primary/10 text-brand-primary border-l-2 border-brand-primary"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -377,7 +518,9 @@ export default function Dashboard() {
         <header className="px-8 py-5 border-b border-white/5 bg-[#050508] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <LayoutDashboard className="w-5 h-5 text-brand-secondary" />
-            <h1 className="text-lg font-bold text-white uppercase tracking-wider">{activeTab} Manager</h1>
+            <h1 className="text-lg font-bold text-white uppercase tracking-wider">
+              {activeTab} Manager
+            </h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -407,88 +550,154 @@ export default function Dashboard() {
 
         <div className="p-8 max-w-5xl w-full mx-auto space-y-6">
           {/* TAB 1: Profile Manager */}
-          {activeTab === 'profile' && profile && (
-            <form onSubmit={handleProfileSave} className="glass border-white/5 rounded-3xl p-6 md:p-8 space-y-6 shadow-md">
+          {activeTab === "profile" && profile && (
+            <form
+              onSubmit={handleProfileSave}
+              className="glass border-white/5 rounded-3xl p-6 md:p-8 space-y-6 shadow-md"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="prof-name" className="text-xs font-semibold text-zinc-400 uppercase">Your Name</label>
+                  <label
+                    htmlFor="prof-name"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    Your Name
+                  </label>
                   <input
                     id="prof-name"
                     type="text"
                     required
                     value={profile.name}
-                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, name: e.target.value })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="prof-desig" className="text-xs font-semibold text-zinc-400 uppercase">Designation</label>
+                  <label
+                    htmlFor="prof-desig"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    Designation
+                  </label>
                   <input
                     id="prof-desig"
                     type="text"
                     required
                     value={profile.designation}
-                    onChange={(e) => setProfile({ ...profile, designation: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, designation: e.target.value })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="prof-pic" className="text-xs font-semibold text-zinc-400 uppercase">Photo URL</label>
+                  <label
+                    htmlFor="prof-pic"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    Photo URL
+                  </label>
                   <input
                     id="prof-pic"
                     type="text"
                     value={profile.photo_url}
-                    onChange={(e) => setProfile({ ...profile, photo_url: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, photo_url: e.target.value })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="prof-resume" className="text-xs font-semibold text-zinc-400 uppercase">Resume URL</label>
+                  <label
+                    htmlFor="prof-resume"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    Resume URL
+                  </label>
                   <input
                     id="prof-resume"
                     type="text"
                     value={profile.resume_url}
-                    onChange={(e) => setProfile({ ...profile, resume_url: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, resume_url: e.target.value })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="prof-email" className="text-xs font-semibold text-zinc-400 uppercase">Email Address</label>
+                  <label
+                    htmlFor="prof-email"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    Email Address
+                  </label>
                   <input
                     id="prof-email"
                     type="email"
                     value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, email: e.target.value })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="prof-phone" className="text-xs font-semibold text-zinc-400 uppercase">Phone Number</label>
+                  <label
+                    htmlFor="prof-phone"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    Phone Number
+                  </label>
                   <input
                     id="prof-phone"
                     type="text"
                     value={profile.phone}
-                    onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, phone: e.target.value })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="prof-wa" className="text-xs font-semibold text-zinc-400 uppercase">WhatsApp Number (Optional)</label>
+                  <label
+                    htmlFor="prof-wa"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    WhatsApp Number (Optional)
+                  </label>
                   <input
                     id="prof-wa"
                     type="text"
                     value={profile.whatsapp}
-                    onChange={(e) => setProfile({ ...profile, whatsapp: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, whatsapp: e.target.value })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="prof-hobbies" className="text-xs font-semibold text-zinc-400 uppercase">Hobbies (comma separated)</label>
+                  <label
+                    htmlFor="prof-hobbies"
+                    className="text-xs font-semibold text-zinc-400 uppercase"
+                  >
+                    Hobbies (comma separated)
+                  </label>
                   <input
                     id="prof-hobbies"
                     type="text"
-                    value={Array.isArray(profile.hobbies) ? profile.hobbies.join(', ') : profile.hobbies}
-                    onChange={(e) => setProfile({ ...profile, hobbies: e.target.value.split(',').map(s => s.trim()) })}
+                    value={
+                      Array.isArray(profile.hobbies)
+                        ? profile.hobbies.join(", ")
+                        : profile.hobbies
+                    }
+                    onChange={(e) =>
+                      setProfile({
+                        ...profile,
+                        hobbies: e.target.value.split(",").map((s) => s.trim()),
+                      })
+                    }
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                   />
                 </div>
@@ -496,19 +705,31 @@ export default function Dashboard() {
 
               {/* Social Links Sub-Grid */}
               <div className="p-5 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                <h3 className="text-sm font-bold text-white">Social Media Links</h3>
+                <h3 className="text-sm font-bold text-white">
+                  Social Media Links
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {['github', 'linkedin', 'twitter', 'facebook'].map((plat) => (
+                  {["github", "linkedin", "twitter", "facebook"].map((plat) => (
                     <div key={plat} className="space-y-2">
-                      <label htmlFor={`soc-${plat}`} className="text-xs font-semibold text-zinc-400 uppercase">{plat}</label>
+                      <label
+                        htmlFor={`soc-${plat}`}
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        {plat}
+                      </label>
                       <input
                         id={`soc-${plat}`}
                         type="text"
-                        value={profile.social_links[plat] || ''}
-                        onChange={(e) => setProfile({
-                          ...profile,
-                          social_links: { ...profile.social_links, [plat]: e.target.value }
-                        })}
+                        value={profile.social_links[plat] || ""}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            social_links: {
+                              ...profile.social_links,
+                              [plat]: e.target.value,
+                            },
+                          })
+                        }
                         className="w-full px-4 py-2.5 rounded-xl bg-[#09090b] border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm"
                       />
                     </div>
@@ -517,12 +738,19 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="prof-journey" className="text-xs font-semibold text-zinc-400 uppercase">About Me / Journey</label>
+                <label
+                  htmlFor="prof-journey"
+                  className="text-xs font-semibold text-zinc-400 uppercase"
+                >
+                  About Me / Journey
+                </label>
                 <textarea
                   id="prof-journey"
                   rows={5}
                   value={profile.about_me}
-                  onChange={(e) => setProfile({ ...profile, about_me: e.target.value })}
+                  onChange={(e) =>
+                    setProfile({ ...profile, about_me: e.target.value })
+                  }
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary transition-colors text-sm resize-none"
                 />
               </div>
@@ -538,7 +766,7 @@ export default function Dashboard() {
           )}
 
           {/* TAB 2: Projects CRUD */}
-          {activeTab === 'projects' && (
+          {activeTab === "projects" && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-bold text-white">Project List</h3>
@@ -554,14 +782,28 @@ export default function Dashboard() {
               {/* List grid */}
               <div className="grid grid-cols-1 gap-4">
                 {projects.map((project) => (
-                  <div key={project.id} className="glass p-5 rounded-2xl flex items-center justify-between gap-4 border-white/5">
+                  <div
+                    key={project.id}
+                    className="glass p-5 rounded-2xl flex items-center justify-between gap-4 border-white/5"
+                  >
                     <div className="flex items-center gap-4 overflow-hidden">
                       <div className="w-16 h-10 rounded-lg overflow-hidden bg-zinc-950 flex-shrink-0">
-                        <img src={project.image_url || 'https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&q=80&w=150'} alt={project.title} className="object-cover w-full h-full" />
+                        <img
+                          src={
+                            project.image_url ||
+                            "https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&q=80&w=150"
+                          }
+                          alt={project.title}
+                          className="object-cover w-full h-full"
+                        />
                       </div>
                       <div className="overflow-hidden">
-                        <h4 className="font-bold text-white truncate">{project.title}</h4>
-                        <p className="text-xs text-zinc-500 truncate max-w-lg">{project.description}</p>
+                        <h4 className="font-bold text-white truncate">
+                          {project.title}
+                        </h4>
+                        <p className="text-xs text-zinc-500 truncate max-w-lg">
+                          {project.description}
+                        </p>
                       </div>
                     </div>
                     <div className="flex gap-2 flex-shrink-0">
@@ -572,7 +814,14 @@ export default function Dashboard() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete('Project', 'projects', project.id, setProjects)}
+                        onClick={() =>
+                          handleDelete(
+                            "Project",
+                            "projects",
+                            project.id,
+                            setProjects,
+                          )
+                        }
                         className="p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -585,7 +834,7 @@ export default function Dashboard() {
           )}
 
           {/* TAB 3: Skills CRUD */}
-          {activeTab === 'skills' && (
+          {activeTab === "skills" && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-bold text-white">Skills Matrix</h3>
@@ -602,16 +851,23 @@ export default function Dashboard() {
                 {skills.map((skill) => {
                   const iconResult = getSkillIcon(skill.name);
                   return (
-                    <div key={skill.id} className="glass p-5 rounded-2xl flex items-center justify-between border-white/5">
+                    <div
+                      key={skill.id}
+                      className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                    >
                       <div className="flex items-center gap-3">
                         {iconResult ? (
-                          <span className="text-2xl leading-none">{iconResult.icon}</span>
+                          <span className="text-2xl leading-none">
+                            {iconResult.icon}
+                          </span>
                         ) : (
                           <span className="w-6 h-6 rounded bg-white/10 inline-block" />
                         )}
                         <div>
                           <h4 className="font-bold text-white">{skill.name}</h4>
-                          <p className="text-xs text-zinc-400">{skill.category} — {skill.percentage}%</p>
+                          <p className="text-xs text-zinc-400">
+                            {skill.category} — {skill.percentage}%
+                          </p>
                         </div>
                       </div>
                       <div className="flex gap-2">
@@ -622,7 +878,9 @@ export default function Dashboard() {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete('Skill', 'skills', skill.id, setSkills)}
+                          onClick={() =>
+                            handleDelete("Skill", "skills", skill.id, setSkills)
+                          }
                           className="p-2 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -636,10 +894,12 @@ export default function Dashboard() {
           )}
 
           {/* TAB 4: Experience CRUD */}
-          {activeTab === 'experience' && (
+          {activeTab === "experience" && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-white">Experiences Timeline</h3>
+                <h3 className="text-lg font-bold text-white">
+                  Experiences Timeline
+                </h3>
                 <button
                   onClick={() => openFormModal()}
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
@@ -651,10 +911,15 @@ export default function Dashboard() {
 
               <div className="space-y-4">
                 {experiences.map((exp) => (
-                  <div key={exp.id} className="glass p-5 rounded-2xl flex items-center justify-between border-white/5">
+                  <div
+                    key={exp.id}
+                    className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                  >
                     <div>
                       <h4 className="font-bold text-white">{exp.role}</h4>
-                      <p className="text-xs text-zinc-400">{exp.company} | {exp.duration}</p>
+                      <p className="text-xs text-zinc-400">
+                        {exp.company} | {exp.duration}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -664,7 +929,14 @@ export default function Dashboard() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete('Experience', 'experience', exp.id, setExperiences)}
+                        onClick={() =>
+                          handleDelete(
+                            "Experience",
+                            "experience",
+                            exp.id,
+                            setExperiences,
+                          )
+                        }
                         className="p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -677,10 +949,12 @@ export default function Dashboard() {
           )}
 
           {/* TAB 5: Education CRUD */}
-          {activeTab === 'education' && (
+          {activeTab === "education" && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-white">Education History</h3>
+                <h3 className="text-lg font-bold text-white">
+                  Education History
+                </h3>
                 <button
                   onClick={() => openFormModal()}
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
@@ -692,10 +966,15 @@ export default function Dashboard() {
 
               <div className="space-y-4">
                 {educations.map((edu) => (
-                  <div key={edu.id} className="glass p-5 rounded-2xl flex items-center justify-between border-white/5">
+                  <div
+                    key={edu.id}
+                    className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                  >
                     <div>
                       <h4 className="font-bold text-white">{edu.degree}</h4>
-                      <p className="text-xs text-zinc-400">{edu.institution} | {edu.duration}</p>
+                      <p className="text-xs text-zinc-400">
+                        {edu.institution} | {edu.duration}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -705,7 +984,14 @@ export default function Dashboard() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete('Education', 'education', edu.id, setEducations)}
+                        onClick={() =>
+                          handleDelete(
+                            "Education",
+                            "education",
+                            edu.id,
+                            setEducations,
+                          )
+                        }
                         className="p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -718,10 +1004,12 @@ export default function Dashboard() {
           )}
 
           {/* TAB 6: Blogs CRUD */}
-          {activeTab === 'blogs' && (
+          {activeTab === "blogs" && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-white">Published Blogs</h3>
+                <h3 className="text-lg font-bold text-white">
+                  Published Blogs
+                </h3>
                 <button
                   onClick={() => openFormModal()}
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-primary text-sm font-semibold text-white hover:bg-brand-primary/95 transition-all duration-200"
@@ -733,10 +1021,15 @@ export default function Dashboard() {
 
               <div className="space-y-4">
                 {blogs.map((blog) => (
-                  <div key={blog.id} className="glass p-5 rounded-2xl flex items-center justify-between border-white/5">
+                  <div
+                    key={blog.id}
+                    className="glass p-5 rounded-2xl flex items-center justify-between border-white/5"
+                  >
                     <div>
                       <h4 className="font-bold text-white">{blog.title}</h4>
-                      <p className="text-xs text-zinc-500 truncate max-w-md">{blog.content}</p>
+                      <p className="text-xs text-zinc-500 truncate max-w-md">
+                        {blog.content}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -746,7 +1039,9 @@ export default function Dashboard() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete('Blog', 'blogs', blog.id, setBlogs)}
+                        onClick={() =>
+                          handleDelete("Blog", "blogs", blog.id, setBlogs)
+                        }
                         className="p-2.5 rounded-xl hover:bg-red-500/10 text-zinc-400 hover:text-red-400 transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -766,148 +1061,531 @@ export default function Dashboard() {
           <div className="glass border-white/10 w-full max-w-xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col animate-slide-up">
             <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
               <h3 className="text-lg font-bold text-white">
-                {currentEditItem ? 'Edit' : 'Add New'} {activeTab.slice(0, -1)}
+                {currentEditItem ? "Edit" : "Add New"} {activeTab.slice(0, -1)}
               </h3>
-              <button onClick={closeFormModal} className="text-zinc-500 hover:text-white transition-all">Close</button>
+              <button
+                onClick={closeFormModal}
+                className="text-zinc-500 hover:text-white transition-all"
+              >
+                Close
+              </button>
             </div>
 
             <div className="p-6 overflow-y-auto space-y-4 flex-grow">
               {/* Form Render based on ActiveTab */}
-              {activeTab === 'projects' && (
+              {activeTab === "projects" && (
                 <form onSubmit={handleProjectSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <label htmlFor="proj-title" className="text-xs font-semibold text-zinc-400 uppercase">Project Name</label>
-                    <input id="proj-title" type="text" required value={projectForm.title} onChange={(e) => setProjectForm({ ...projectForm, title: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                    <label
+                      htmlFor="proj-title"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Project Name
+                    </label>
+                    <input
+                      id="proj-title"
+                      type="text"
+                      required
+                      value={projectForm.title}
+                      onChange={(e) =>
+                        setProjectForm({
+                          ...projectForm,
+                          title: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="proj-img" className="text-xs font-semibold text-zinc-400 uppercase">Image URL</label>
-                    <input id="proj-img" type="text" value={projectForm.image_url} onChange={(e) => setProjectForm({ ...projectForm, image_url: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                    <label
+                      htmlFor="proj-img"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Image URL
+                    </label>
+                    <input
+                      id="proj-img"
+                      type="text"
+                      value={projectForm.image_url}
+                      onChange={(e) =>
+                        setProjectForm({
+                          ...projectForm,
+                          image_url: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="proj-stack" className="text-xs font-semibold text-zinc-400 uppercase">Tech Stack (comma separated)</label>
-                    <input id="proj-stack" type="text" required placeholder="React, Express, PostgreSQL" value={projectForm.tech_stack} onChange={(e) => setProjectForm({ ...projectForm, tech_stack: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                    <label
+                      htmlFor="proj-stack"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Tech Stack (comma separated)
+                    </label>
+                    <input
+                      id="proj-stack"
+                      type="text"
+                      required
+                      placeholder="React, Express, PostgreSQL"
+                      value={projectForm.tech_stack}
+                      onChange={(e) =>
+                        setProjectForm({
+                          ...projectForm,
+                          tech_stack: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="proj-live" className="text-xs font-semibold text-zinc-400 uppercase">Live Link</label>
-                      <input id="proj-live" type="text" value={projectForm.live_link} onChange={(e) => setProjectForm({ ...projectForm, live_link: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                      <label
+                        htmlFor="proj-live"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        Live Link
+                      </label>
+                      <input
+                        id="proj-live"
+                        type="text"
+                        value={projectForm.live_link}
+                        onChange={(e) =>
+                          setProjectForm({
+                            ...projectForm,
+                            live_link: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="proj-git" className="text-xs font-semibold text-zinc-400 uppercase">GitHub Repo Link</label>
-                      <input id="proj-git" type="text" value={projectForm.github_link} onChange={(e) => setProjectForm({ ...projectForm, github_link: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                      <label
+                        htmlFor="proj-git"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        GitHub Repo Link
+                      </label>
+                      <input
+                        id="proj-git"
+                        type="text"
+                        value={projectForm.github_link}
+                        onChange={(e) =>
+                          setProjectForm({
+                            ...projectForm,
+                            github_link: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="proj-desc" className="text-xs font-semibold text-zinc-400 uppercase">Description</label>
-                    <textarea id="proj-desc" required rows={3} value={projectForm.description} onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none" />
+                    <label
+                      htmlFor="proj-desc"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      id="proj-desc"
+                      required
+                      rows={3}
+                      value={projectForm.description}
+                      onChange={(e) =>
+                        setProjectForm({
+                          ...projectForm,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="proj-challenges" className="text-xs font-semibold text-zinc-400 uppercase">Challenges Faced</label>
-                    <textarea id="proj-challenges" rows={2} value={projectForm.challenges} onChange={(e) => setProjectForm({ ...projectForm, challenges: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none" />
+                    <label
+                      htmlFor="proj-challenges"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Challenges Faced
+                    </label>
+                    <textarea
+                      id="proj-challenges"
+                      rows={2}
+                      value={projectForm.challenges}
+                      onChange={(e) =>
+                        setProjectForm({
+                          ...projectForm,
+                          challenges: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="proj-future" className="text-xs font-semibold text-zinc-400 uppercase">Future Plans</label>
-                    <textarea id="proj-future" rows={2} value={projectForm.future_plans} onChange={(e) => setProjectForm({ ...projectForm, future_plans: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none" />
+                    <label
+                      htmlFor="proj-future"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Future Plans
+                    </label>
+                    <textarea
+                      id="proj-future"
+                      rows={2}
+                      value={projectForm.future_plans}
+                      onChange={(e) =>
+                        setProjectForm({
+                          ...projectForm,
+                          future_plans: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                    />
                   </div>
-                  <button type="submit" className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white">Save Project</button>
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                  >
+                    Save Project
+                  </button>
                 </form>
               )}
 
-              {activeTab === 'skills' && (
+              {activeTab === "skills" && (
                 <form onSubmit={handleSkillSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <label htmlFor="sk-name" className="text-xs font-semibold text-zinc-400 uppercase">Skill Name</label>
-                    <input id="sk-name" type="text" required value={skillForm.name} onChange={(e) => setSkillForm({ ...skillForm, name: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                    <label
+                      htmlFor="sk-name"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Skill Name
+                    </label>
+                    <input
+                      id="sk-name"
+                      type="text"
+                      required
+                      value={skillForm.name}
+                      onChange={(e) =>
+                        setSkillForm({ ...skillForm, name: e.target.value })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                    />
                     {/* Auto icon preview */}
-                    {skillForm.name && (() => {
-                      const iconResult = getSkillIcon(skillForm.name);
-                      return iconResult ? (
-                        <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 w-fit">
-                          <span className="text-xl leading-none">{iconResult.icon}</span>
-                          <span className="text-xs text-zinc-400">Icon auto-detected</span>
-                        </div>
-                      ) : (
-                        <p className="text-xs text-zinc-600 mt-1">No icon found — will display a placeholder</p>
-                      );
-                    })()}
+                    {skillForm.name &&
+                      (() => {
+                        const iconResult = getSkillIcon(skillForm.name);
+                        return iconResult ? (
+                          <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 w-fit">
+                            <span className="text-xl leading-none">
+                              {iconResult.icon}
+                            </span>
+                            <span className="text-xs text-zinc-400">
+                              Icon auto-detected
+                            </span>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-zinc-600 mt-1">
+                            No icon found — will display a placeholder
+                          </p>
+                        );
+                      })()}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="sk-pct" className="text-xs font-semibold text-zinc-400 uppercase">Competency Percentage</label>
-                      <input id="sk-pct" type="number" required min={0} max={100} value={Number.isNaN(skillForm.percentage) ? '' : skillForm.percentage} onChange={(e) => setSkillForm({ ...skillForm, percentage: parseInt(e.target.value) })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                      <label
+                        htmlFor="sk-pct"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        Competency Percentage
+                      </label>
+                      <input
+                        id="sk-pct"
+                        type="number"
+                        required
+                        min={0}
+                        max={100}
+                        value={
+                          Number.isNaN(skillForm.percentage)
+                            ? ""
+                            : skillForm.percentage
+                        }
+                        onChange={(e) =>
+                          setSkillForm({
+                            ...skillForm,
+                            percentage: parseInt(e.target.value),
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="sk-cat" className="text-xs font-semibold text-zinc-400 uppercase">Category</label>
-                      <select id="sk-cat" value={skillForm.category} onChange={(e) => setSkillForm({ ...skillForm, category: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm">
+                      <label
+                        htmlFor="sk-cat"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        Category
+                      </label>
+                      <select
+                        id="sk-cat"
+                        value={skillForm.category}
+                        onChange={(e) =>
+                          setSkillForm({
+                            ...skillForm,
+                            category: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      >
                         <option>Frontend</option>
                         <option>Backend</option>
                         <option>Tools</option>
                       </select>
                     </div>
                   </div>
-                  <button type="submit" className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white">Save Skill</button>
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                  >
+                    Save Skill
+                  </button>
                 </form>
               )}
 
-              {activeTab === 'experience' && (
+              {activeTab === "experience" && (
                 <form onSubmit={handleExperienceSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <label htmlFor="exp-role" className="text-xs font-semibold text-zinc-400 uppercase">Role / Title</label>
-                    <input id="exp-role" type="text" required value={experienceForm.role} onChange={(e) => setExperienceForm({ ...experienceForm, role: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                    <label
+                      htmlFor="exp-role"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Role / Title
+                    </label>
+                    <input
+                      id="exp-role"
+                      type="text"
+                      required
+                      value={experienceForm.role}
+                      onChange={(e) =>
+                        setExperienceForm({
+                          ...experienceForm,
+                          role: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="exp-comp" className="text-xs font-semibold text-zinc-400 uppercase">Company Name</label>
-                      <input id="exp-comp" type="text" required value={experienceForm.company} onChange={(e) => setExperienceForm({ ...experienceForm, company: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                      <label
+                        htmlFor="exp-comp"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        Company Name
+                      </label>
+                      <input
+                        id="exp-comp"
+                        type="text"
+                        required
+                        value={experienceForm.company}
+                        onChange={(e) =>
+                          setExperienceForm({
+                            ...experienceForm,
+                            company: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="exp-dur" className="text-xs font-semibold text-zinc-400 uppercase">Duration (e.g. 2024 - Present)</label>
-                      <input id="exp-dur" type="text" required value={experienceForm.duration} onChange={(e) => setExperienceForm({ ...experienceForm, duration: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                      <label
+                        htmlFor="exp-dur"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        Duration (e.g. 2024 - Present)
+                      </label>
+                      <input
+                        id="exp-dur"
+                        type="text"
+                        required
+                        value={experienceForm.duration}
+                        onChange={(e) =>
+                          setExperienceForm({
+                            ...experienceForm,
+                            duration: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="exp-desc" className="text-xs font-semibold text-zinc-400 uppercase">Responsibilities / Summary</label>
-                    <textarea id="exp-desc" rows={4} value={experienceForm.description} onChange={(e) => setExperienceForm({ ...experienceForm, description: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none" />
+                    <label
+                      htmlFor="exp-desc"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Responsibilities / Summary
+                    </label>
+                    <textarea
+                      id="exp-desc"
+                      rows={4}
+                      value={experienceForm.description}
+                      onChange={(e) =>
+                        setExperienceForm({
+                          ...experienceForm,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                    />
                   </div>
-                  <button type="submit" className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white">Save Experience</button>
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                  >
+                    Save Experience
+                  </button>
                 </form>
               )}
 
-              {activeTab === 'education' && (
+              {activeTab === "education" && (
                 <form onSubmit={handleEducationSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <label htmlFor="edu-deg" className="text-xs font-semibold text-zinc-400 uppercase">Degree Name</label>
-                    <input id="edu-deg" type="text" required value={educationForm.degree} onChange={(e) => setEducationForm({ ...educationForm, degree: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                    <label
+                      htmlFor="edu-deg"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Degree Name
+                    </label>
+                    <input
+                      id="edu-deg"
+                      type="text"
+                      required
+                      value={educationForm.degree}
+                      onChange={(e) =>
+                        setEducationForm({
+                          ...educationForm,
+                          degree: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <label htmlFor="edu-inst" className="text-xs font-semibold text-zinc-400 uppercase">Institution</label>
-                      <input id="edu-inst" type="text" required value={educationForm.institution} onChange={(e) => setEducationForm({ ...educationForm, institution: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                      <label
+                        htmlFor="edu-inst"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        Institution
+                      </label>
+                      <input
+                        id="edu-inst"
+                        type="text"
+                        required
+                        value={educationForm.institution}
+                        onChange={(e) =>
+                          setEducationForm({
+                            ...educationForm,
+                            institution: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="edu-dur" className="text-xs font-semibold text-zinc-400 uppercase">Duration (e.g. 2020 - 2024)</label>
-                      <input id="edu-dur" type="text" required value={educationForm.duration} onChange={(e) => setEducationForm({ ...educationForm, duration: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                      <label
+                        htmlFor="edu-dur"
+                        className="text-xs font-semibold text-zinc-400 uppercase"
+                      >
+                        Duration (e.g. 2020 - 2024)
+                      </label>
+                      <input
+                        id="edu-dur"
+                        type="text"
+                        required
+                        value={educationForm.duration}
+                        onChange={(e) =>
+                          setEducationForm({
+                            ...educationForm,
+                            duration: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                      />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="edu-desc" className="text-xs font-semibold text-zinc-400 uppercase">Academic Details / Summary</label>
-                    <textarea id="edu-desc" rows={4} value={educationForm.description} onChange={(e) => setEducationForm({ ...educationForm, description: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none" />
+                    <label
+                      htmlFor="edu-desc"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Academic Details / Summary
+                    </label>
+                    <textarea
+                      id="edu-desc"
+                      rows={4}
+                      value={educationForm.description}
+                      onChange={(e) =>
+                        setEducationForm({
+                          ...educationForm,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                    />
                   </div>
-                  <button type="submit" className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white">Save Education Record</button>
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                  >
+                    Save Education Record
+                  </button>
                 </form>
               )}
 
-              {activeTab === 'blogs' && (
+              {activeTab === "blogs" && (
                 <form onSubmit={handleBlogSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <label htmlFor="bl-title" className="text-xs font-semibold text-zinc-400 uppercase">Blog Title</label>
-                    <input id="bl-title" type="text" required value={blogForm.title} onChange={(e) => setBlogForm({ ...blogForm, title: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm" />
+                    <label
+                      htmlFor="bl-title"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Blog Title
+                    </label>
+                    <input
+                      id="bl-title"
+                      type="text"
+                      required
+                      value={blogForm.title}
+                      onChange={(e) =>
+                        setBlogForm({ ...blogForm, title: e.target.value })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="bl-content" className="text-xs font-semibold text-zinc-400 uppercase">Blog Content</label>
-                    <textarea id="bl-content" required rows={6} value={blogForm.content} onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })} className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none" />
+                    <label
+                      htmlFor="bl-content"
+                      className="text-xs font-semibold text-zinc-400 uppercase"
+                    >
+                      Blog Content
+                    </label>
+                    <textarea
+                      id="bl-content"
+                      required
+                      rows={6}
+                      value={blogForm.content}
+                      onChange={(e) =>
+                        setBlogForm({ ...blogForm, content: e.target.value })
+                      }
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-brand-primary text-sm resize-none"
+                    />
                   </div>
-                  <button type="submit" className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white">Publish Post</button>
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-xl bg-brand-primary text-sm font-semibold text-white"
+                  >
+                    Publish Post
+                  </button>
                 </form>
               )}
             </div>

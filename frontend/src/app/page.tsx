@@ -1,42 +1,76 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Github, Linkedin, Twitter, Facebook, FileText, ArrowRight, BookOpen, Mail, Sparkles, Calendar, Clock } from 'lucide-react';
-import { fadeUp, fadeLeft, fadeRight, staggerContainer, staggerItem, scalePop, lineExpand, viewportOnce } from '@/lib/animations';
-import Navbar from '@/components/Navbar';
-import ProjectCard from '@/components/ProjectCard';
-import ProjectDetailsModal from '@/components/ProjectDetailsModal';
-import BlogDetailsModal from '@/components/BlogDetailsModal';
-import SkillsSection from '@/components/SkillsSection';
-import Timeline from '@/components/Timeline';
-import ContactForm from '@/components/ContactForm';
-import Footer from '@/components/Footer';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  Github,
+  Linkedin,
+  Twitter,
+  Facebook,
+  FileText,
+  ArrowRight,
+  BookOpen,
+  Mail,
+  Sparkles,
+  Calendar,
+  Clock,
+} from "lucide-react";
+import {
+  fadeUp,
+  fadeLeft,
+  fadeRight,
+  staggerContainer,
+  staggerItem,
+  scalePop,
+  lineExpand,
+  viewportOnce,
+} from "@/lib/animations";
+import Navbar from "@/components/Navbar";
+import ProjectCard from "@/components/ProjectCard";
+import ProjectDetailsModal from "@/components/ProjectDetailsModal";
+import BlogDetailsModal from "@/components/BlogDetailsModal";
+import SkillsSection from "@/components/SkillsSection";
+import Timeline from "@/components/Timeline";
+import ContactForm from "@/components/ContactForm";
+import Footer from "@/components/Footer";
 
 const emptyProfile = {
   id: 1,
-  name: '',
-  designation: '',
-  photo_url: '',
-  resume_url: '',
-  email: '',
-  phone: '',
-  whatsapp: '',
-  about_me: '',
+  name: "",
+  designation: "",
+  photo_url: "",
+  resume_url: "",
+  email: "",
+  phone: "",
+  whatsapp: "",
+  about_me: "",
   social_links: {} as Record<string, string | undefined>,
-  hobbies: [] as string[]
+  hobbies: [] as string[],
 };
 
 const getTagsFromContent = (content: string) => {
   const hashTags = content.match(/#\w+/g);
   if (hashTags && hashTags.length > 0) {
-    return hashTags.map(tag => tag.replace('#', '').toUpperCase());
+    return hashTags.map((tag) => tag.replace("#", "").toUpperCase());
   }
-  const keywords = ['react', 'node', 'javascript', 'typescript', 'css', 'html', 'python', 'database', 'docker', 'nextjs'];
+  const keywords = [
+    "react",
+    "node",
+    "javascript",
+    "typescript",
+    "css",
+    "html",
+    "python",
+    "database",
+    "docker",
+    "nextjs",
+  ];
   const lowerContent = content.toLowerCase();
-  const found = keywords.filter(kw => lowerContent.includes(kw)).map(kw => kw.toUpperCase());
+  const found = keywords
+    .filter((kw) => lowerContent.includes(kw))
+    .map((kw) => kw.toUpperCase());
   if (found.length > 0) return found.slice(0, 3);
-  return ['TECH', 'LOG'];
+  return ["TECH", "LOG"];
 };
 
 const calculateReadTime = (content: string) => {
@@ -70,30 +104,31 @@ export default function Home() {
   // Hidden Dashboard route hash monitor
   useEffect(() => {
     const checkHash = () => {
-      if (window.location.hash === '#/dashboard') {
-        window.location.href = '/dashboard';
+      if (window.location.hash === "#/dashboard") {
+        window.location.href = "/dashboard";
       }
     };
     checkHash();
-    window.addEventListener('hashchange', checkHash);
-    return () => window.removeEventListener('hashchange', checkHash);
+    window.addEventListener("hashchange", checkHash);
+    return () => window.removeEventListener("hashchange", checkHash);
   }, []);
 
   // Fetch portfolio data from Express server API
   useEffect(() => {
-    const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api`;
+    const API_URL = `${process.env.NEXT_PUBLIC_API_URL || "https://new-portfolio-oqtj.onrender.com"}/api`;
 
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [profRes, projRes, skillsRes, expRes, eduRes, blogRes] = await Promise.all([
-          fetch(`${API_URL}/profile`),
-          fetch(`${API_URL}/projects`),
-          fetch(`${API_URL}/skills`),
-          fetch(`${API_URL}/experience`),
-          fetch(`${API_URL}/education`),
-          fetch(`${API_URL}/blogs`)
-        ]);
+        const [profRes, projRes, skillsRes, expRes, eduRes, blogRes] =
+          await Promise.all([
+            fetch(`${API_URL}/profile`),
+            fetch(`${API_URL}/projects`),
+            fetch(`${API_URL}/skills`),
+            fetch(`${API_URL}/experience`),
+            fetch(`${API_URL}/education`),
+            fetch(`${API_URL}/blogs`),
+          ]);
 
         if (profRes.ok) setProfile(await profRes.json());
         if (projRes.ok) setProjects(await projRes.json());
@@ -102,7 +137,7 @@ export default function Home() {
         if (eduRes.ok) setEducation(await eduRes.json());
         if (blogRes.ok) setBlogs(await blogRes.json());
       } catch (e) {
-        console.error('Error fetching backend data:', e);
+        console.error("Error fetching backend data:", e);
       } finally {
         setIsLoading(false);
       }
@@ -133,11 +168,11 @@ export default function Home() {
   // Social Links Helper
   const getSocialIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
-      case 'github':
+      case "github":
         return <Github className="w-5 h-5" />;
-      case 'linkedin':
+      case "linkedin":
         return <Linkedin className="w-5 h-5" />;
-      case 'twitter':
+      case "twitter":
         return <Twitter className="w-5 h-5" />;
       default:
         return <Facebook className="w-5 h-5" />;
@@ -176,35 +211,54 @@ export default function Home() {
             initial="hidden"
             animate="visible"
           >
-            <motion.div variants={scalePop} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-xs font-semibold text-brand-primary">
+            <motion.div
+              variants={scalePop}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-xs font-semibold text-brand-primary"
+            >
               <Sparkles className="w-3.5 h-3.5" />
               Available for work
             </motion.div>
-            
-            <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-              Hi, I am <span className="text-brand-primary">{profile.name}</span>
+
+            <motion.h1
+              variants={fadeUp}
+              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight"
+            >
+              Hi, I am{" "}
+              <span className="text-brand-primary">{profile.name}</span>
             </motion.h1>
-            
-            <motion.p variants={fadeUp} className="text-xl sm:text-2xl font-bold text-base-content/85">
+
+            <motion.p
+              variants={fadeUp}
+              className="text-xl sm:text-2xl font-bold text-base-content/85"
+            >
               {profile.designation}
             </motion.p>
-            
-            <motion.p variants={fadeUp} className="text-base-content/65 text-base max-w-lg leading-relaxed">
-              I construct robust architectural backends and client-focused, immersive frontend designs. Let us build something extraordinary.
+
+            <motion.p
+              variants={fadeUp}
+              className="text-base-content/65 text-base max-w-lg leading-relaxed"
+            >
+              I construct robust architectural backends and client-focused,
+              immersive frontend designs. Let us build something extraordinary.
             </motion.p>
 
             {/* Resume Button */}
-            <motion.div variants={fadeUp} className="pt-2 flex flex-wrap gap-4 items-center">
+            <motion.div
+              variants={fadeUp}
+              className="pt-2 flex flex-wrap gap-4 items-center"
+            >
               <motion.a
-                href={profile.resume_url || '#'}
-                target={profile.resume_url ? '_blank' : undefined}
+                href={profile.resume_url || "#"}
+                target={profile.resume_url ? "_blank" : undefined}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-primary hover:bg-brand-primary/90 text-sm font-semibold text-white transition-all duration-300 shadow-sm hover:shadow-md"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={(e) => {
                   if (!profile.resume_url) {
                     e.preventDefault();
-                    alert('Resume is not ready yet! You can upload it from the admin dashboard.');
+                    alert(
+                      "Resume is not ready yet! You can upload it from the admin dashboard.",
+                    );
                   }
                 }}
               >
@@ -244,18 +298,22 @@ export default function Home() {
             <motion.div
               className="relative group"
               whileHover={{ scale: 1.03 }}
-              transition={{ type: 'spring', stiffness: 200 }}
+              transition={{ type: "spring", stiffness: 200 }}
             >
               {/* Outer decorative primary border */}
               <div className="absolute inset-0.5 bg-brand-primary rounded-3xl blur-md opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
-              
+
               <div className="relative w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] rounded-3xl overflow-hidden bg-base-200 border-2 border-base-content/10 flex items-center justify-center">
                 <img
-                  src={profile.photo_url || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=400'}
+                  src={
+                    profile.photo_url ||
+                    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=400"
+                  }
                   alt={profile.name}
                   className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=400';
+                    (e.target as HTMLImageElement).src =
+                      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=400";
                   }}
                 />
               </div>
@@ -265,35 +323,75 @@ export default function Home() {
       </section>
 
       {/* About Me Section */}
-      <section id="about" className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5 bg-base-200/30">
+      <section
+        id="about"
+        className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5 bg-base-200/30"
+      >
         <div className="max-w-5xl mx-auto space-y-12">
-          <motion.div className="text-center space-y-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">About Me</h2>
-            <motion.div className="w-16 h-1 bg-brand-primary mx-auto rounded-full" variants={lineExpand} initial="hidden" whileInView="visible" viewport={viewportOnce} />
+          <motion.div
+            className="text-center space-y-3"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
+            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+              About Me
+            </h2>
+            <motion.div
+              className="w-16 h-1 bg-brand-primary mx-auto rounded-full"
+              variants={lineExpand}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            />
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
-            <motion.div className="md:col-span-3 glass p-6 md:p-8 rounded-3xl space-y-4" variants={fadeLeft} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-              <h3 className="text-xl font-bold text-base-content">My Programming Journey</h3>
+            <motion.div
+              className="md:col-span-3 glass p-6 md:p-8 rounded-3xl space-y-4"
+              variants={fadeLeft}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            >
+              <h3 className="text-xl font-bold text-base-content">
+                My Programming Journey
+              </h3>
               <p className="text-base-content/70 text-sm leading-relaxed whitespace-pre-line">
                 {profile.about_me}
               </p>
             </motion.div>
 
-            <motion.div className="md:col-span-2 space-y-6" variants={fadeRight} initial="hidden" whileInView="visible" viewport={viewportOnce}>
+            <motion.div
+              className="md:col-span-2 space-y-6"
+              variants={fadeRight}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            >
               <div className="glass p-6 md:p-8 rounded-3xl space-y-4">
-                <h3 className="text-xl font-bold text-base-content">Hobbies & Interests</h3>
-                <motion.div className="flex flex-wrap gap-2" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-                  {profile.hobbies && profile.hobbies.map((hobby, idx) => (
-                    <motion.span
-                      key={idx}
-                      variants={scalePop}
-                      whileHover={{ scale: 1.08 }}
-                      className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-base-200 border border-base-content/10 text-base-content/80"
-                    >
-                      {hobby}
-                    </motion.span>
-                  ))}
+                <h3 className="text-xl font-bold text-base-content">
+                  Hobbies & Interests
+                </h3>
+                <motion.div
+                  className="flex flex-wrap gap-2"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={viewportOnce}
+                >
+                  {profile.hobbies &&
+                    profile.hobbies.map((hobby, idx) => (
+                      <motion.span
+                        key={idx}
+                        variants={scalePop}
+                        whileHover={{ scale: 1.08 }}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-base-200 border border-base-content/10 text-base-content/80"
+                      >
+                        {hobby}
+                      </motion.span>
+                    ))}
                 </motion.div>
               </div>
             </motion.div>
@@ -302,12 +400,31 @@ export default function Home() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5">
+      <section
+        id="skills"
+        className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5"
+      >
         <div className="max-w-5xl mx-auto space-y-12">
-          <motion.div className="text-center space-y-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">My Skillset</h2>
-            <p className="text-base-content/60 text-sm">Visualizing my technological competence across different sectors.</p>
-            <motion.div className="w-16 h-1 bg-brand-primary mx-auto rounded-full" variants={lineExpand} initial="hidden" whileInView="visible" viewport={viewportOnce} />
+          <motion.div
+            className="text-center space-y-3"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
+            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+              My Skillset
+            </h2>
+            <p className="text-base-content/60 text-sm">
+              Visualizing my technological competence across different sectors.
+            </p>
+            <motion.div
+              className="w-16 h-1 bg-brand-primary mx-auto rounded-full"
+              variants={lineExpand}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            />
           </motion.div>
 
           <SkillsSection skills={skills} />
@@ -315,11 +432,28 @@ export default function Home() {
       </section>
 
       {/* Experience & Education Section */}
-      <section id="experience" className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5 bg-base-200/30">
+      <section
+        id="experience"
+        className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5 bg-base-200/30"
+      >
         <div className="max-w-5xl mx-auto space-y-12">
-          <motion.div className="text-center space-y-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">Journey & Milestones</h2>
-            <motion.div className="w-16 h-1 bg-brand-primary mx-auto rounded-full" variants={lineExpand} initial="hidden" whileInView="visible" viewport={viewportOnce} />
+          <motion.div
+            className="text-center space-y-3"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
+            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+              Journey & Milestones
+            </h2>
+            <motion.div
+              className="w-16 h-1 bg-brand-primary mx-auto rounded-full"
+              variants={lineExpand}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            />
           </motion.div>
 
           <Timeline experience={experience} education={education} />
@@ -327,16 +461,37 @@ export default function Home() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5">
+      <section
+        id="projects"
+        className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5"
+      >
         <div className="max-w-5xl mx-auto space-y-12">
-          <motion.div className="text-center space-y-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">Featured Projects</h2>
-            <p className="text-base-content/60 text-sm">A small selection of my recent developments.</p>
-            <motion.div className="w-16 h-1 bg-brand-primary mx-auto rounded-full" variants={lineExpand} initial="hidden" whileInView="visible" viewport={viewportOnce} />
+          <motion.div
+            className="text-center space-y-3"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
+            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+              Featured Projects
+            </h2>
+            <p className="text-base-content/60 text-sm">
+              A small selection of my recent developments.
+            </p>
+            <motion.div
+              className="w-16 h-1 bg-brand-primary mx-auto rounded-full"
+              variants={lineExpand}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            />
           </motion.div>
 
           {projects.length === 0 ? (
-            <p className="text-center text-base-content/50 py-10">No projects added yet.</p>
+            <p className="text-center text-base-content/50 py-10">
+              No projects added yet.
+            </p>
           ) : (
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -357,19 +512,40 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="blogs" className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5 bg-base-200/30">
+      <section
+        id="blogs"
+        className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5 bg-base-200/30"
+      >
         <div className="max-w-5xl mx-auto space-y-12">
-          <motion.div className="text-center space-y-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
+          <motion.div
+            className="text-center space-y-3"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
             <span className="font-mono text-xs uppercase tracking-widest text-brand-primary font-bold block">
               KNOWLEDGE_BASE // WRITINGS
             </span>
-            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">Technical Log Archives</h2>
-            <p className="text-base-content/60 text-sm">Sharing my thoughts and insights on software engineering.</p>
-            <motion.div className="w-16 h-1 bg-brand-primary mx-auto rounded-full" variants={lineExpand} initial="hidden" whileInView="visible" viewport={viewportOnce} />
+            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+              Technical Log Archives
+            </h2>
+            <p className="text-base-content/60 text-sm">
+              Sharing my thoughts and insights on software engineering.
+            </p>
+            <motion.div
+              className="w-16 h-1 bg-brand-primary mx-auto rounded-full"
+              variants={lineExpand}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            />
           </motion.div>
 
           {blogs.length === 0 ? (
-            <p className="text-center text-base-content/50 py-10">No blog posts published yet.</p>
+            <p className="text-center text-base-content/50 py-10">
+              No blog posts published yet.
+            </p>
           ) : (
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -403,7 +579,10 @@ export default function Home() {
                       <div className="flex flex-wrap items-center gap-4 text-[10px] font-mono text-base-content/50 uppercase tracking-wider">
                         <span className="flex items-center gap-1.5">
                           <Calendar size={12} className="text-brand-primary" />
-                          {new Date(blog.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {new Date(blog.created_at).toLocaleDateString(
+                            undefined,
+                            { year: "numeric", month: "short", day: "numeric" },
+                          )}
                         </span>
                         <span className="flex items-center gap-1.5">
                           <Clock size={12} className="text-brand-primary" />
@@ -418,7 +597,7 @@ export default function Home() {
 
                       {/* Excerpt */}
                       <p className="text-sm text-base-content/70 line-clamp-3 leading-relaxed mb-4">
-                        {blog.content.replace(/#\w+/g, '').trim()}
+                        {blog.content.replace(/#\w+/g, "").trim()}
                       </p>
                     </div>
 
@@ -435,7 +614,11 @@ export default function Home() {
                         ))}
                       </div>
                       <span className="font-mono text-xs uppercase tracking-widest text-brand-primary flex items-center gap-1 group-hover:underline">
-                        LOG_READ <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                        LOG_READ{" "}
+                        <ArrowRight
+                          size={12}
+                          className="group-hover:translate-x-0.5 transition-transform"
+                        />
                       </span>
                     </div>
                   </motion.article>
@@ -447,16 +630,44 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5">
+      <section
+        id="contact"
+        className="py-24 px-4 sm:px-6 lg:px-8 border-t border-base-content/5"
+      >
         <div className="max-w-5xl mx-auto space-y-12">
-          <motion.div className="text-center space-y-3" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">Get In Touch</h2>
-            <p className="text-base-content/60 text-sm">Let us coordinate and collaborate on your next project.</p>
-            <motion.div className="w-16 h-1 bg-brand-primary mx-auto rounded-full" variants={lineExpand} initial="hidden" whileInView="visible" viewport={viewportOnce} />
+          <motion.div
+            className="text-center space-y-3"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
+            <h2 className="text-3xl font-bold tracking-tight text-base-content sm:text-4xl">
+              Get In Touch
+            </h2>
+            <p className="text-base-content/60 text-sm">
+              Let us coordinate and collaborate on your next project.
+            </p>
+            <motion.div
+              className="w-16 h-1 bg-brand-primary mx-auto rounded-full"
+              variants={lineExpand}
+              initial="hidden"
+              whileInView="visible"
+              viewport={viewportOnce}
+            />
           </motion.div>
 
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
-            <ContactForm email={profile.email} phone={profile.phone} whatsapp={profile.whatsapp} />
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+          >
+            <ContactForm
+              email={profile.email}
+              phone={profile.phone}
+              whatsapp={profile.whatsapp}
+            />
           </motion.div>
         </div>
       </section>
